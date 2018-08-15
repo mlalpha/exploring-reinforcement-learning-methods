@@ -98,7 +98,7 @@ class Population :
 
 
 def replayBestBots(bestNeuralNets, steps, sleep):  
-    choice = input("Do you want to watch the replay ?[Y/N] : ")
+    choice = input("Do you want to watch the replay ?[Y/E/N] : ")
     if choice=='Y' or choice=='y':
         for i in range(len(bestNeuralNets)):
             if (i+1)%steps == 0 :
@@ -118,6 +118,26 @@ def replayBestBots(bestNeuralNets, steps, sleep):
                         observation = env.reset()
                         break
                 print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i+1, bestNeuralNets[i].fitness, totalReward))
+    elif choice=='E':
+        for i in range(100,len(bestNeuralNets)):
+            if (i+1)%steps == 0 :
+                observation = env.reset()
+                totalReward = 0
+                for step in range(MAX_STEPS):
+                    env.render()
+                    # time.sleep(sleep)
+                    action = bestNeuralNets[i].feed_forword(
+                        torch.from_numpy(
+                            np.array([observation], dtype=np.float32)
+                            ).type(torch_float)
+                        ).cpu().numpy()[0]
+                    observation, reward, done, info = env.step(action)
+                    totalReward += reward
+                    if done:
+                        observation = env.reset()
+                        break
+                print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i+1, bestNeuralNets[i].fitness, totalReward))
+        
 
 
 def recordBestBots(bestNeuralNets):  
@@ -146,8 +166,8 @@ def recordBestBots(bestNeuralNets):
 
 
 GAME = 'BipedalWalker-v2'
-MAX_STEPS = 5000
-MAX_GENERATIONS = 100
+MAX_STEPS = 1000
+MAX_GENERATIONS = 150
 POPULATION_COUNT = 500
 MUTATION_RATE = 0.02
 env = gym.make(GAME)
@@ -159,7 +179,7 @@ obsMax = env.observation_space.high
 actionMin = env.action_space.low
 actionMax = env.action_space.high
 
-D_in, D_out, D_H = in_dimen, out_dimen, 100
+D_in, D_out, D_H = in_dimen, out_dimen, 80
 pop = Population(POPULATION_COUNT, MUTATION_RATE, [D_in, D_H, D_out])
 bestNeuralNets = []
 
@@ -177,8 +197,7 @@ for gen in range(MAX_GENERATIONS):
         observation = env.reset()
         totalReward = 0
         for step in range(MAX_STEPS):
-            if gen > 95:
-                env.render()
+            # env.render()
 
             action = nn.feed_forword(
                 torch.from_numpy(
