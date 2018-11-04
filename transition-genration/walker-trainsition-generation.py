@@ -47,4 +47,4 @@ for episode in range(num_of_episodes):
             episode, len(observations_action)))
         
 np.save('x_train_observations_action.npy', observations_action)
-np.save('y_train_observation_reward.npy', observations_reward)
+np.save('y_train_observations_reward.npy', observations_reward)
