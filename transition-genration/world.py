@@ -37,6 +37,9 @@ class World():
         x = x.reshape((1, x.shape[0]))
         prediction = self.model.predict(x)
         return prediction[:, :-1], prediction[:, -1]
+    
+    def retrain(self, observation_action, target, epochs = 3):
+        self.model.fit(observation_action, target, epochs = epochs, verbose = 0)
 
 
 if __name__ == '__main__':
