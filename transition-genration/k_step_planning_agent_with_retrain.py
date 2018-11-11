@@ -75,6 +75,7 @@ if __name__ == '__main__':
             score += reward
             predicted_score += predicted_reward
             if done:
+            	agent.retrain()
                 break 
         scores_deque.append(score)
         predicted_score_deque.append(predicted_score)
@@ -85,6 +86,5 @@ if __name__ == '__main__':
         if i_episode % 10 == 0:
             print('Episode {}\tAverage Score: {:.2f}\t predicted Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.mean(predicted_score_deque)))   
             print('Max Score: {:.2f}\n'.format(max_score))
-            agent.retrain()
 
     print('Avg Score: {:.2f}\n'.format(np.mean(scores)))
