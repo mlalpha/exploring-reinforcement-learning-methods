@@ -26,11 +26,14 @@ class DDPGAgent(BaseAgent):
         self.planning_agent = KStepPlanningAgent(env)
 
 
-    def train(self, use_k_step = 0.1):
+    def train(self, use_k_step = 0.1, load = Fasle):
         # Initialize target network weights
         self.actor.update_target_network()
         self.critic.update_target_network()
-
+        max_reward = -99999
+        if load:
+            self.load()
+        
         for cur_episode in tqdm(range(self.max_episodes)):
 
             # evaluate here. 
@@ -113,6 +116,9 @@ class DDPGAgent(BaseAgent):
                     train_episode_summary.value.add(simple_value=episode_ave_max_q/float(cur_step), tag="train/episode_ave_max_q")
                     self.writer.add_summary(train_episode_summary, cur_episode)
                     self.writer.flush()
+                    if (episode_reward > max_reward):
+                        max_reward = episode_reward
+                        self.save()
 
                     print ('Reward: %.2i' % int(episode_reward), ' | Episode', cur_episode, '| Qmax: %.4f' % (episode_ave_max_q / float(cur_step)))
 
@@ -138,4 +144,12 @@ class DDPGAgent(BaseAgent):
         eval_episode_summary = tf.Summary()
         eval_episode_summary.value.add(simple_value=ave_episode_reward, tag="eval/reward")
         self.writer.add_summary(eval_episode_summary, cur_episode)
+    
+    def save(self):
+         saver = tf.train.Saver()
+         save_path = saver.save(self.sess, "./tmp/model/model.ckpt")
+    
+    def load(self, path = "./tmp/model/model.ckpt"):
+        saver = tf.train.Saver()
+        saver.restore(sess, path)
 
