@@ -26,7 +26,7 @@ class DDPGAgent(BaseAgent):
         self.planning_agent = KStepPlanningAgent(env)
 
 
-    def train(self, use_k_step = 0.1, load = Fasle):
+    def train(self, use_k_step = 0.1, load = False):
         # Initialize target network weights
         self.actor.update_target_network()
         self.critic.update_target_network()
